@@ -28,7 +28,6 @@ public class FilmControllerTest {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
-
     @Test
     void isCreateFilmWithAllArgumentsNotGood() {
         Film film = new Film(0, "  ", "FilmDescription AboutFilmDescription " +
@@ -38,9 +37,7 @@ public class FilmControllerTest {
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
         assertEquals(3, violations.size(), "Не все поймано");
-        ;
     }
-
     @Test
     void isGoodFilmAddAndGetGoodID() {
         Film film = new Film(0, "FilmName", "FilmDescription",
@@ -48,7 +45,6 @@ public class FilmControllerTest {
         filmController.add(film);
         assertEquals(1, film.getId(), "ID NOT GOOD");
     }
-
     @Test
     void isFilmAddWithNullNameAndNotAddWithEmptyName() {
         Film filmWithNullName = new Film(0, null, "FilmDescription",
@@ -63,7 +59,6 @@ public class FilmControllerTest {
                 });
         assertEquals("Название фильма не может быть пустым", exception.getMessage(), "No ValidationException");
     }
-
     @Test
     void isFilmAddWithDescriptionNullAndNotAddIfDiscriptMoreThan200() {
         Film filmWithNullDescription = new Film(0, "FilmName", null,
@@ -81,7 +76,6 @@ public class FilmControllerTest {
         assertEquals("Описание фильма не может быть длинее 200 символов",
                 exception.getMessage(), "No ValidationException");
     }
-
     @Test
     void isFilmAddWithReleaseNullAndNotAddIfReleaseBefore28121895() {
         Film filmWithNullRelease = new Film(0, "FilmName", "FilmDescription", null, 120);
@@ -96,7 +90,6 @@ public class FilmControllerTest {
         assertEquals("Дата релиза фильма не может быть раньше 28 декабря 1895 года",
                 exception.getMessage(), "No ValidationException");
     }
-
     @Test
     void isFilmNotAddIfDurationNegative() {
         Film filmWithNegativeDuration = new Film(0, "FilmName", "FilmDescription",
@@ -108,7 +101,6 @@ public class FilmControllerTest {
         assertEquals("Продолжительность фильма должна быть положительной",
                 exception.getMessage(), "No ValidationException");
     }
-
     @Test
     void isFilmUpdateWithGoodIDAndNotUpdateWithNotExistID() {
         Film film = new Film(0, null, null, null, 0);

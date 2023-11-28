@@ -27,7 +27,6 @@ public class UserController {
     public String findUsers() {
         return gson.toJson(users.values());
     }
-
     @PostMapping
     public User create(@Valid @RequestBody User user) {
         validate(user);
@@ -36,7 +35,6 @@ public class UserController {
         users.put(counter, user);
         return user;
     }
-
     @PutMapping
     public User update(@Valid @RequestBody User user) {
         int userId = user.getId();
@@ -50,7 +48,6 @@ public class UserController {
         }
         return user;
     }
-
     private User validate(User user) {
         String userEmail = user.getEmail();
         if (userEmail != null && (userEmail.isBlank() || !userEmail.contains("@"))) {
