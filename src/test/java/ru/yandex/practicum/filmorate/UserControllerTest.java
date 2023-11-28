@@ -6,14 +6,13 @@ import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Set;
-
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,12 +20,14 @@ public class UserControllerTest {
     private Validator validator;
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private UserController userController;
+
     @BeforeEach
     void beforeEach() {
         userController = new UserController();
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
+
     @Test
     void isCreateUserWithAllArgumentsNotGood() {
         User user = new User(0, "name@", " ", " ",
@@ -35,6 +36,7 @@ public class UserControllerTest {
         assertFalse(violations.isEmpty());
         assertEquals(3, violations.size(), "Не все поймано");
     }
+
     @Test
     void isGoodUserCreateAndGetGoodID() {
         User user = new User(0, "name@mail.ru", "Advocate", "name",
@@ -42,6 +44,7 @@ public class UserControllerTest {
         userController.create(user);
         assertEquals(1, user.getId(), "ID NOT GOOD");
     }
+
     @Test
     void isUserCreateWithNullEmailAndNotCreateWithEmptyEmailAndEmailWithoutSpecialSign() {
         User userWithNullEmail = new User(0, null, "Advocate", "name",
@@ -65,6 +68,7 @@ public class UserControllerTest {
         assertEquals("Электронная почта не может быть пустой и должна содержать символ @",
                 exception.getMessage(), "No ValidationException");
     }
+
     @Test
     void isUserCreateWithNullLoginAndNotCreateWithEmptyLoginAndLoginWithSpace() {
         User userWithNullLogin = new User(0, "name@mail.ru", null, "name",
@@ -88,6 +92,7 @@ public class UserControllerTest {
         assertEquals("Логин не может быть пустым и содержать пробелы",
                 exception.getMessage(), "No ValidationException");
     }
+
     @Test
     void isUserWithNullNameAndIfNameEmptyNameBecomeLogin() {
         User userWithNullName = new User(0, "name@mail.ru", "Advocate", null,
@@ -102,6 +107,7 @@ public class UserControllerTest {
         assertEquals(2, userWithEmptyName.getId(), "ID NOT GOOD");
         assertEquals(userWithEmptyName.getName(), userWithEmptyName.getLogin(), "NAME != LOGIN");
     }
+
     @Test
     void isUserCreateWithNullBirthdayAndNotCreateWithFutureBirthday() {
         User userWithNullEmail = new User(0, "name@mail.ru", "Advocate", "name", null);
@@ -115,6 +121,7 @@ public class UserControllerTest {
                 });
         assertEquals("Дата рождения не может быть в будущем", exception.getMessage(), "No ValidationException");
     }
+
     @Test
     void isUserUpdateWithGoodIDAndNotUpdateWithNotExistID() {
         User user = new User(0, null, null, null, null);

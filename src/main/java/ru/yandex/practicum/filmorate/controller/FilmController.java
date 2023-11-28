@@ -27,6 +27,7 @@ public class FilmController {
     public String findFilms() {
         return gson.toJson(films.values());
     }
+
     @PostMapping
     public Film add(@Valid @RequestBody Film film) {
         validate(film);
@@ -35,6 +36,7 @@ public class FilmController {
         films.put(counter, film);
         return film;
     }
+
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
         int filmId = film.getId();
@@ -48,6 +50,7 @@ public class FilmController {
         }
         return film;
     }
+
     private Film validate(Film film) {
         String filmName = film.getName();
         if (filmName != null && filmName.isBlank()) {
