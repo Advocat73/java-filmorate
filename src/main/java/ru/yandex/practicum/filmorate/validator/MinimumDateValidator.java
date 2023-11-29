@@ -1,4 +1,6 @@
-package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate.validator;
+
+import ru.yandex.practicum.filmorate.validator.MinimumDate;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

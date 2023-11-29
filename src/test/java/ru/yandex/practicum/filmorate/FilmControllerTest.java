@@ -37,76 +37,69 @@ public class FilmControllerTest {
                 "BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA",
                 LocalDate.of(1885, 1, 13), 120);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
-        assertFalse(violations.isEmpty());
-        assertEquals(3, violations.size(), "Не все поймано");
+        assertEquals(3, violations.size(), "Не все проблемы пойманы");
     }
 
     @Test
     void isGoodFilmAddAndGetGoodID() {
         Film film = new Film(0, "FilmName", "FilmDescription",
                 LocalDate.of(1985, 1, 13), 120);
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertTrue(violations.isEmpty());
         filmController.add(film);
         assertEquals(1, film.getId(), "ID NOT GOOD");
     }
 
     @Test
-    void isFilmAddWithNullNameAndNotAddWithEmptyName() {
+    void isFilmNotCreateWithNameNullOrEmptyName() {
         Film filmWithNullName = new Film(0, null, "FilmDescription",
                 LocalDate.of(1985, 1, 13), 120);
-        filmController.add(filmWithNullName);
-        assertEquals(1, filmWithNullName.getId(), "ID NOT GOOD");
+        Set<ConstraintViolation<Film>> violations = validator.validate(filmWithNullName);
+        assertEquals(1, violations.size(), "Проблемы с name не пойманы");
 
-        ValidationException exception = assertThrows(
-                ValidationException.class, () -> {
-                    filmController.add(new Film(0, " ", "FilmDescription",
-                            LocalDate.of(1985, 1, 13), 120));
-                });
-        assertEquals("Название фильма не может быть пустым", exception.getMessage(), "No ValidationException");
+        Film filmWithEmptyName = new Film(0, " ", "FilmDescription",
+                LocalDate.of(1985, 1, 13), 120);
+        violations = validator.validate(filmWithEmptyName);
+        assertEquals(1, violations.size(), "Проблемы с name не пойманы");
     }
 
     @Test
-    void isFilmAddWithDescriptionNullAndNotAddIfDiscriptMoreThan200() {
+    void isFilmCreateAndAddWithDescriptionNullAndNotCreateIfDiscriptMoreThan200() {
         Film filmWithNullDescription = new Film(0, "FilmName", null,
                 LocalDate.of(1985, 1, 13), 120);
+        Set<ConstraintViolation<Film>> violations = validator.validate(filmWithNullDescription);
+        assertTrue(violations.isEmpty());
         filmController.add(filmWithNullDescription);
         assertEquals(1, filmWithNullDescription.getId(), "ID NOT GOOD");
+
         Film filmWithTooLondDescript = new Film(0, "FilmName", "FilmDescription AboutFilmDescription " +
                 "WhenFilmDescription Too Long So FilmDescription Must Be Change In Order To FilmDescription Not To Be So Long " +
                 "BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA",
                 LocalDate.of(1985, 1, 13), 120);
-        ValidationException exception = assertThrows(
-                ValidationException.class, () -> {
-                    filmController.add(filmWithTooLondDescript);
-                });
-        assertEquals("Описание фильма не может быть длинее 200 символов",
-                exception.getMessage(), "No ValidationException");
+        violations = validator.validate(filmWithTooLondDescript);
+        assertEquals(1, violations.size(), "Проблемы с description не пойманы");
     }
 
     @Test
-    void isFilmAddWithReleaseNullAndNotAddIfReleaseBefore28121895() {
+    void isFilmCreateNadAddWithReleaseNullAndNotCreateIfReleaseBefore28121895() {
         Film filmWithNullRelease = new Film(0, "FilmName", "FilmDescription", null, 120);
+        Set<ConstraintViolation<Film>> violations = validator.validate(filmWithNullRelease);
+        assertTrue(violations.isEmpty());
         filmController.add(filmWithNullRelease);
         assertEquals(1, filmWithNullRelease.getId(), "ID NOT GOOD");
+
         Film filmWithReleaseBefore28121895 = new Film(0, "FilmName", "FilmDescription",
                 LocalDate.of(1885, 1, 13), 120);
-        ValidationException exception = assertThrows(
-                ValidationException.class, () -> {
-                    filmController.add(filmWithReleaseBefore28121895);
-                });
-        assertEquals("Дата релиза фильма не может быть раньше 28 декабря 1895 года",
-                exception.getMessage(), "No ValidationException");
+        violations = validator.validate(filmWithReleaseBefore28121895);
+        assertEquals(1, violations.size(), "Проблемы с DateRelease не пойманы");
     }
 
     @Test
-    void isFilmNotAddIfDurationNegative() {
+    void isFilmNotCreateIfDurationNegative() {
         Film filmWithNegativeDuration = new Film(0, "FilmName", "FilmDescription",
                 LocalDate.of(1985, 1, 13), -100);
-        ValidationException exception = assertThrows(
-                ValidationException.class, () -> {
-                    filmController.add(filmWithNegativeDuration);
-                });
-        assertEquals("Продолжительность фильма должна быть положительной",
-                exception.getMessage(), "No ValidationException");
+        Set<ConstraintViolation<Film>> violations = validator.validate(filmWithNegativeDuration);
+        assertEquals(1, violations.size(), "Проблемы с Duration не пойманы");
     }
 
     @Test

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.ConstraintViolation;
@@ -47,55 +48,50 @@ public class UserControllerTest {
     }
 
     @Test
-    void isUserCreateWithNullEmailAndNotCreateWithEmptyEmailAndEmailWithoutSpecialSign() {
+    void isUserCreateWithNullEmailAndNotCreateWithEmptyEmailAndEmailWithoutSpecialSignAndEmailWithSpecialSignOnEnd() {
         User userWithNullEmail = new User(0, null, "Advocate", "name",
                 LocalDate.of(2000, 1, 13));
+        Set<ConstraintViolation<User>> violations = validator.validate(userWithNullEmail);
+        assertTrue(violations.isEmpty());
         userController.create(userWithNullEmail);
         assertEquals(1, userWithNullEmail.getId(), "ID NOT GOOD");
 
-        ValidationException exception = assertThrows(
-                ValidationException.class, () -> {
-                    userController.create(new User(0, " ", "Advocate",
-                            "name", LocalDate.of(2000, 1, 13)));
-                });
-        assertEquals("Электронная почта не может быть пустой и должна содержать символ @",
-                exception.getMessage(), "No ValidationException");
+        User userWithEmptyEmai = new User(0, " ", "Advocate",
+                "name", LocalDate.of(2000, 1, 13));
+        violations = validator.validate(userWithEmptyEmai);
+        assertEquals(1, violations.size(), "Проблемы с пустым Email не пойманы");
 
-        exception = assertThrows(
-                ValidationException.class, () -> {
-                    userController.create(new User(0, "name.mail.ru", "Advocate",
-                            "name", LocalDate.of(2000, 1, 13)));
-                });
-        assertEquals("Электронная почта не может быть пустой и должна содержать символ @",
-                exception.getMessage(), "No ValidationException");
+        User userWithEmailWithoutSpecialSign = new User(0, "Email.Without.SpecialSign", "Advocate",
+                "name", LocalDate.of(2000, 1, 13));
+        violations = validator.validate(userWithEmailWithoutSpecialSign);
+        assertEquals(1, violations.size(), "Проблемы с Email без @ не пойманы");
+
+        User userWithEmailWithSpecialSignOnEnd = new User(0, "EmailWithSpecialSignOnEnd@", "Advocate",
+                "name", LocalDate.of(2000, 1, 13));
+        violations = validator.validate(userWithEmailWithSpecialSignOnEnd);
+        assertEquals(1, violations.size(), "Проблемы с Email с @ на конце не пойманы");
     }
 
     @Test
-    void isUserCreateWithNullLoginAndNotCreateWithEmptyLoginAndLoginWithSpace() {
+    void isUserNotCreateWithNullLoginAndEmptyLoginAndLoginWithSpace() {
         User userWithNullLogin = new User(0, "name@mail.ru", null, "name",
                 LocalDate.of(2000, 1, 13));
-        userController.create(userWithNullLogin);
-        assertEquals(1, userWithNullLogin.getId(), "ID NOT GOOD");
+        Set<ConstraintViolation<User>> violations = validator.validate(userWithNullLogin);
+        assertEquals(1, violations.size(), "Проблемы с login = null не пойманы");
 
-        ValidationException exception = assertThrows(
-                ValidationException.class, () -> {
-                    userController.create(new User(0, "name@mail.ru", "   ",
-                            "name", LocalDate.of(2000, 1, 13)));
-                });
-        assertEquals("Логин не может быть пустым и содержать пробелы",
-                exception.getMessage(), "No ValidationException");
+        User userWithEmptyLogin = new User(0, "name@mail.ru", "", "name",
+                LocalDate.of(2000, 1, 13));
+        violations = validator.validate(userWithEmptyLogin);
+        assertEquals(1, violations.size(), "Проблемы с пустым login не пойманы");
 
-        exception = assertThrows(
-                ValidationException.class, () -> {
-                    userController.create(new User(0, "name@mail.ru", "login withSpace",
-                            "name", LocalDate.of(2000, 1, 13)));
-                });
-        assertEquals("Логин не может быть пустым и содержать пробелы",
-                exception.getMessage(), "No ValidationException");
+        User userWithLoginWithSpace = new User(0, "name@mail.ru", "Login WithSpace", "name",
+                LocalDate.of(2000, 1, 13));
+        violations = validator.validate(userWithLoginWithSpace);
+        assertEquals(1, violations.size(), "Проблемы с login, в котором пробелы не пойманы");
     }
 
     @Test
-    void isUserWithNullNameAndIfNameEmptyNameBecomeLogin() {
+    void isUserWithNullNameAndIfNameEmptySoNameBecomeLogin() {
         User userWithNullName = new User(0, "name@mail.ru", "Advocate", null,
                 LocalDate.of(2000, 1, 13));
         userController.create(userWithNullName);
@@ -115,12 +111,10 @@ public class UserControllerTest {
         userController.create(userWithNullEmail);
         assertEquals(1, userWithNullEmail.getId(), "ID NOT GOOD");
 
-        ValidationException exception = assertThrows(
-                ValidationException.class, () -> {
-                    userController.create(new User(0, "name@mail.ru", "Advocate",
-                            "name", LocalDate.of(2024, 1, 13)));
-                });
-        assertEquals("Дата рождения не может быть в будущем", exception.getMessage(), "No ValidationException");
+        User userWithWithFutureBirthday = new User(0, "name@mail.ru", "Advocate",
+                "name", LocalDate.of(2024, 1, 13));
+        Set<ConstraintViolation<User>> violations = validator.validate(userWithWithFutureBirthday);
+        assertEquals(1, violations.size(), "Проблемы с birthday, который в будущем не пойманы");
     }
 
     @Test

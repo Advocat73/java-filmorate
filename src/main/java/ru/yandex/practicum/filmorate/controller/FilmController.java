@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,27 +46,6 @@ public class FilmController {
     }
 
     private Film validate(Film film) {
-        String filmName = film.getName();
-        if (filmName != null && filmName.isBlank()) {
-            log.error("Название фильма не может быть пустым");
-            throw new ValidationException("Название фильма не может быть пустым");
-        }
-        String filmDescription = film.getDescription();
-        if (filmDescription != null) {
-            log.info("Длина описания фильма - " + filmDescription.length());
-            if (filmDescription.length() > 200) {
-                log.error("Описание фильма не может быть длинее 200 символов");
-                throw new ValidationException("Описание фильма не может быть длинее 200 символов");
-            }
-        }
-        if (film.getReleaseDate() != null && !film.getReleaseDate().isAfter(LocalDate.of(1895, 12, 28))) {
-            log.error("Дата релиза фильма не может быть раньше 28 декабря 1895 года");
-            throw new ValidationException("Дата релиза фильма не может быть раньше 28 декабря 1895 года");
-        }
-        if (film.getDuration() < 0) {
-            log.error("Продолжительность фильма должна быть положительной");
-            throw new ValidationException("Продолжительность фильма должна быть положительной");
-        }
         return film;
     }
 

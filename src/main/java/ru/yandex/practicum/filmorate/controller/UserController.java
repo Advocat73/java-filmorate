@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,23 +46,9 @@ public class UserController {
     }
 
     private User validate(User user) {
-        String userEmail = user.getEmail();
-        if (userEmail != null && (userEmail.isBlank() || !userEmail.contains("@"))) {
-            log.error("Электронная почта не может быть пустой и должна содержать символ @");
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
-        }
-        String userLogin = user.getLogin();
-        if (userLogin != null && (userLogin.isBlank() || userLogin.contains(" "))) {
-            log.error("Логин не может быть пустым и содержать пробелы");
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
-        }
         if (user.getName() == null || user.getName().isBlank()) {
             log.warn("Имя пустое -> присваиваем логин");
-            user.setName(userLogin);
-        }
-        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
-            log.error("Дата рождения не может быть в будущем");
-            throw new ValidationException("Дата рождения не может быть в будущем");
+            user.setName(user.getLogin());
         }
         return user;
     }
