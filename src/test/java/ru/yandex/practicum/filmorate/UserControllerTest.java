@@ -24,8 +24,9 @@ public class UserControllerTest {
     @BeforeEach
     void beforeEach() {
         userController = new UserController();
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
     }
 
     @Test

@@ -25,8 +25,9 @@ public class FilmControllerTest {
     @BeforeEach
     void beforeEach() {
         filmController = new FilmController();
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
     }
 
     @Test
