@@ -5,7 +5,6 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.validator.NotWithSpace;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
 import java.time.LocalDate;
 
