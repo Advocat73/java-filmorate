@@ -65,12 +65,14 @@ public class FilmService {
         Film film = find(filmID);
         checkUserID(userID);
         film.addLike(userID);
+        filmStorage.add(film);
     }
 
     public void removeLike(Integer filmID, Long userID) {
         Film film = find(filmID);
         checkUserID(userID);
         film.removeLike(userID);
+        filmStorage.add(film);
     }
 
     private int compare(Film f1, Film f2) {

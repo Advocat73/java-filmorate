@@ -54,6 +54,8 @@ public class UserService {
         User friend = findUser(friendID);
         user.addFriend(friendID);
         friend.addFriend(userID);
+        userStorage.add(user);
+        userStorage.add(friend);
         log.info("Пользователи с ID " + userID + " и " + friendID + " подружились!");
     }
 
@@ -62,6 +64,8 @@ public class UserService {
         User friend = findUser(friendID);
         user.removeFriend(friendID);
         friend.removeFriend(userID);
+        userStorage.add(user);
+        userStorage.add(friend);
         log.info("Пользователи с ID " + userID + " и " + friendID + " перестали дружить!");
     }
 
