@@ -7,11 +7,13 @@ import ru.yandex.practicum.filmorate.validator.NotWithSpace;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Past;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
 public class User {
-    private int id;
+    private Long id;
     @Email(message = "Email не верен, ошибка в написании")
     private final String email;
     @NotWithSpace(message = "Логин не может быть пустым и содержать пробелы")
@@ -19,5 +21,14 @@ public class User {
     private String name;
     @Past(message = "Дата рождения не может быть в будущем")
     private final LocalDate birthday;
+    private final Set<Long> friends = new HashSet<>();
+
+    public void addFriend(Long friendID) {
+        friends.add(friendID);
+    }
+
+    public void removeFriend(Long friendID) {
+        friends.remove(friendID);
+    }
 }
 
