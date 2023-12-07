@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,10 +54,11 @@ public class FilmService {
         } else throw new NotFoundException("Нет фильма с ID: " + filmID);
     }
 
+
     public List<Film> findMostPopularFilms(int size) {
         List<Film> films = findFilms();
         return films.stream()
-                .sorted(this::compare)
+                .sorted(Comparator.comparingInt((Film f) -> f.getLikes().size()).reversed())
                 .limit(size)
                 .collect(Collectors.toList());
     }
@@ -73,10 +75,6 @@ public class FilmService {
         checkUserID(userID);
         film.removeLike(userID);
         filmStorage.add(film);
-    }
-
-    private int compare(Film f1, Film f2) {
-        return -1 * (f1.getLikes().size() - f2.getLikes().size());
     }
 
     private void checkUserID(Long userID) {
