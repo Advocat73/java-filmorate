@@ -19,11 +19,13 @@ public class Film {
     private final String name;
     @Size(max = 200, message = "Длина описания фильма должна быть не больше {max} символов")
     private final String description;
+    private Genre genre;
     @MinimumDate
     private final LocalDate releaseDate;
     @PositiveOrZero(message = "Продолжительность фильма должна быть положительной")
     private final int duration;
     private final Set<Long> likes = new HashSet<>();
+    private RatingMPA rating;
 
     public void addLike(long like) {
         likes.add(like);

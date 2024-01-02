@@ -7,8 +7,8 @@ import ru.yandex.practicum.filmorate.validator.NotWithSpace;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Past;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
 
 @Data
 @AllArgsConstructor
@@ -21,10 +21,10 @@ public class User {
     private String name;
     @Past(message = "Дата рождения не может быть в будущем")
     private final LocalDate birthday;
-    private final Set<Long> friends = new HashSet<>();
+    private final Map<Long, Boolean> friends = new HashMap<>();
 
-    public void addFriend(Long friendID) {
-        friends.add(friendID);
+    public void addFriend(Long friendID, boolean isFriendAccept) {
+        friends.put(friendID, isFriendAccept);
     }
 
     public void removeFriend(Long friendID) {

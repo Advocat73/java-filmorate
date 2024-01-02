@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -52,8 +53,8 @@ public class UserService {
     public void makeFriends(Long userID, Long friendID) {
         User user = findUser(userID);
         User friend = findUser(friendID);
-        user.addFriend(friendID);
-        friend.addFriend(userID);
+        user.addFriend(friendID, false);
+        friend.addFriend(userID, false);
         userStorage.add(user);
         userStorage.add(friend);
         log.info("Пользователи с ID " + userID + " и " + friendID + " подружились!");
@@ -72,8 +73,8 @@ public class UserService {
 
     public List<User> findFriends(Long userID) {
         User user = findUser(userID);
-        Set<Long> friends = user.getFriends();
-        return friends.stream()
+        Map<Long, Boolean> friends = user.getFriends();
+        return friends.keySet().stream()
                 .map(this::findUser)
                 .collect(Collectors.toList());
     }
@@ -81,8 +82,8 @@ public class UserService {
     public List<User> getCommonFriends(Long userID, Long friendID) {
         User user = findUser(userID);
         User friend = findUser(friendID);
-        return user.getFriends().stream()
-                .filter(id -> friend.getFriends().contains(id))
+        return user.getFriends().keySet().stream()
+                .filter(id -> friend.getFriends().containsKey(id))
                 .map(userStorage::find)
                 .collect(Collectors.toList());
     }
