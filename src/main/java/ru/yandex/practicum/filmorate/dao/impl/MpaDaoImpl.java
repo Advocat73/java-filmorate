@@ -12,6 +12,7 @@ import java.util.List;
 
 @Component
 public class MpaDaoImpl implements MpaDao {
+
     private final JdbcTemplate jdbcTemplate;
 
     public MpaDaoImpl(JdbcTemplate jdbcTemplate) {

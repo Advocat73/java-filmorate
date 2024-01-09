@@ -11,13 +11,15 @@ public interface UserStorage {
 
     public User update(User user);
 
-    public User find(Long userID);
+    public User find(long userId);
 
-    public void remove(Long userID);
+    public void remove(long userId);
 
-    public Boolean isContains(Long userID);
+    public Boolean isContains(long userId);
 
     public void setFriendship(User friend1, User friend2);
 
     public void removeFriendship(User friend1, User friend2);
+
+    public List<Long> findFriends(long userId);
 }

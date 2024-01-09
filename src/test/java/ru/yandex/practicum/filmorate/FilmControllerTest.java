@@ -32,7 +32,7 @@ public class FilmControllerTest {
         Film film = new Film(0, "FilmName", "FilmDescription AboutFilmDescription " +
                 "WhenFilmDescription Too Long So FilmDescription Must Be Change In Order To FilmDescription Not To Be So Long " +
                 "BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA",
-                LocalDate.of(1885, 1, 13), 120, new Mpa(1, "G"));
+                LocalDate.of(1885, 1, 13), -120, new Mpa(1, "G"));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertEquals(3, violations.size(), "Не все проблемы пойманы");
     }

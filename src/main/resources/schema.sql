@@ -9,7 +9,7 @@ create TABLE IF NOT EXISTS films (
   description varchar(200),
   release_date date,
   duration integer,
-  mpa_rate_id integer REFERENCES mpa_rates(id) ON update CASCADE
+  mpa_rate_id integer REFERENCES mpa_rates(id) ON update CASCADE ON delete CASCADE
 );
 
 create TABLE IF NOT EXISTS users (
@@ -21,8 +21,8 @@ create TABLE IF NOT EXISTS users (
 );
 
 create TABLE IF NOT EXISTS likes (
-  film_id integer REFERENCES films (id) ON update CASCADE,
-  user_id integer REFERENCES users (id) ON update CASCADE,
+  film_id integer REFERENCES films (id) ON update CASCADE ON delete CASCADE,
+  user_id integer REFERENCES users (id) ON update CASCADE ON delete CASCADE,
   PRIMARY KEY (film_id, user_id)
 );
 
@@ -32,14 +32,14 @@ create TABLE IF NOT EXISTS genres (
 );
 
 create TABLE IF NOT EXISTS film_genres (
-  film_id integer REFERENCES films (id) ON update CASCADE,
-  genre_id integer REFERENCES genres (id) ON update CASCADE,
+  film_id integer REFERENCES films (id) ON update CASCADE ON delete CASCADE,
+  genre_id integer REFERENCES genres (id) ON update CASCADE ON delete CASCADE,
   PRIMARY KEY (film_id, genre_id)
 );
 
 create TABLE IF NOT EXISTS friends (
-  user_id integer REFERENCES users (id) ON update CASCADE,
-  friend_id integer REFERENCES users (id) ON update CASCADE,
+  user_id integer REFERENCES users (id) ON update CASCADE ON delete CASCADE,
+  friend_id integer REFERENCES users (id) ON update CASCADE ON delete CASCADE,
   isAccepted boolean,
   PRIMARY KEY (user_id, friend_id)
 );

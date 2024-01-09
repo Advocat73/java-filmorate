@@ -51,17 +51,17 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User find(Long userID) {
-        return makeUser(jdbcTemplate.queryForRowSet("select * from users where id = ?", userID));
+    public User find(long userId) {
+        return makeUser(jdbcTemplate.queryForRowSet("select * from users where id = ?", userId));
     }
 
     @Override
-    public void remove(Long userID) {
-        jdbcTemplate.update("DELETE FROM users WHERE id = ?", userID);
+    public void remove(long userId) {
+        jdbcTemplate.update("DELETE FROM users WHERE id = ?", userId);
     }
 
     @Override
-    public Boolean isContains(Long userID) {
+    public Boolean isContains(long userID) {
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT * FROM users WHERE id = ? LIMIT 1", userID);
         return userRows.first();
     }
@@ -71,14 +71,20 @@ public class UserDbStorage implements UserStorage {
         Boolean isFriendshipAccepted = friend1.getFriends().get(friend2.getId());
         jdbcTemplate.update("INSERT INTO friends (user_id, friend_id, isAccepted) values (?, ?, ?)",
                 friend1.getId(), friend2.getId(), isFriendshipAccepted);
-        //jdbcTemplate.update("INSERT INTO friends (user_id, friend_id, isAccepted) values (?, ?, ?)",
-        //        friend2.getId(), friend1.getId(), isFriendshipAccepted);
     }
 
     @Override
     public void removeFriendship(User friend1, User friend2) {
         jdbcTemplate.update("DELETE FROM friends WHERE user_id = ? AND friend_id = ?", friend1.getId(), friend2.getId());
-        //jdbcTemplate.update("DELETE FROM friends WHERE user_id = ? AND friend_id = ?", friend2.getId(), friend1.getId());
+    }
+
+    @Override
+    public List<Long> findFriends(long userId) {
+        List<Long> friends = new ArrayList<>();
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT * FROM friends WHERE friend_id = ?", userId);
+        while (userRows.next())
+            friends.add(userRows.getLong("user_id"));
+        return friends;
     }
 
     private User makeUser(SqlRowSet userRows) {

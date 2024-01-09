@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -47,6 +48,8 @@ public class GenreDaoImpl implements GenreDao {
             jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id) values (?, ?)", filmId, genreId);
         } catch (DuplicateKeyException ex) {
             log.info("Нарушение первичного ключа при добавлении жанра для фильма");
+        } catch (DataIntegrityViolationException ex) {
+            log.info("Ошибка данных при попытке добавления в таблицу");
         }
     }
 

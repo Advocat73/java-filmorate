@@ -29,29 +29,34 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User find(Long userID) {
-        return users.get(userID);
+    public User find(long userId) {
+        return users.get(userId);
     }
 
     @Override
-    public void remove(Long userID) {
-        users.remove(userID);
+    public void remove(long userId) {
+        users.remove(userId);
     }
 
     @Override
-    public Boolean isContains(Long userID) {
-        return users.containsKey(userID);
+    public Boolean isContains(long userId) {
+        return users.containsKey(userId);
     }
 
     @Override
     public void setFriendship(User friend1, User friend2) {
         add(friend1);
-        //add(friend2);
+        add(friend2);
     }
 
     @Override
     public void removeFriendship(User friend1, User friend2) {
         add(friend1);
         add(friend2);
+    }
+
+    @Override
+    public List<Long> findFriends(long userId) {
+        return null;
     }
 }
