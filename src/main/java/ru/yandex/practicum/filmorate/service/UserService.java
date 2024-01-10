@@ -53,7 +53,6 @@ public class UserService {
         User user = findUser(userID);
         User friend = findUser(friendID);
         user.addFriend(friendID, false);
-        //friend.addFriend(userID, false);
         userStorage.setFriendship(user, friend);
         log.info("Пользователm с ID " + userID + " добавил себя в друзья пользвателя с ID " + friendID);
     }
