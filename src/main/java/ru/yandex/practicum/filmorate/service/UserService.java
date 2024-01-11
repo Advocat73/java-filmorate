@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,7 +29,7 @@ public class UserService {
     public User create(User user) {
         validate(user);
         user.setId(++counter);
-        log.info("Пользователь с ID " + user.getId() + " добавляем в систему");
+        log.info("Пользователя с ID " + user.getId() + " добавляем в систему");
         return userStorage.add(user);
     }
 
@@ -39,7 +38,7 @@ public class UserService {
         if (userStorage.isContains(userId)) {
             validate(user);
             log.info("Пользователь с ID " + userId + " изменен");
-            return userStorage.add(user);
+            return userStorage.update(user);
         } else throw new NotFoundException("Нет пользователя с ID: " + userId);
     }
 
@@ -54,10 +53,8 @@ public class UserService {
         User user = findUser(userID);
         User friend = findUser(friendID);
         user.addFriend(friendID, false);
-        friend.addFriend(userID, false);
-        userStorage.add(user);
-        userStorage.add(friend);
-        log.info("Пользователи с ID " + userID + " и " + friendID + " подружились!");
+        userStorage.setFriendship(user, friend);
+        log.info("Пользователm с ID " + userID + " добавил себя в друзья пользвателя с ID " + friendID);
     }
 
     public void removeFriends(Long userID, Long friendID) {
@@ -65,9 +62,8 @@ public class UserService {
         User friend = findUser(friendID);
         user.removeFriend(friendID);
         friend.removeFriend(userID);
-        userStorage.add(user);
-        userStorage.add(friend);
-        log.info("Пользователи с ID " + userID + " и " + friendID + " перестали дружить!");
+        userStorage.removeFriendship(user, friend);
+        log.info("Пользователи с ID " + userID + " удалил себя из друзей пользователя с ID " + friendID);
     }
 
 

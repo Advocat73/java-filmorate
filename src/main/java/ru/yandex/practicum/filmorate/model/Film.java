@@ -8,7 +8,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -19,13 +21,13 @@ public class Film {
     private final String name;
     @Size(max = 200, message = "Длина описания фильма должна быть не больше {max} символов")
     private final String description;
-    private Genre genre;
+    private final List<Genre> genres = new ArrayList<>();
     @MinimumDate
     private final LocalDate releaseDate;
     @PositiveOrZero(message = "Продолжительность фильма должна быть положительной")
     private final int duration;
     private final Set<Long> likes = new HashSet<>();
-    private RatingMPA rating;
+    private Mpa mpa;
 
     public void addLike(long like) {
         likes.add(like);
@@ -33,6 +35,11 @@ public class Film {
 
     public void removeLike(long like) {
         likes.remove(like);
+    }
+
+    public void setGenres(List<Genre> genres) {
+        this.genres.clear();
+        this.genres.addAll(genres);
     }
 }
 

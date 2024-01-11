@@ -12,25 +12,51 @@ import java.util.Map;
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
 
+    @Override
     public List<User> findUsers() {
         return new ArrayList<>(users.values());
     }
 
+    @Override
     public User add(User user) {
         users.put(user.getId(), user);
         return user;
     }
 
-    public User find(Long userID) {
-        return users.get(userID);
+    @Override
+    public User update(User user) {
+        return add(user);
     }
 
-    public void remove(Long userID) {
-        users.remove(userID);
+    @Override
+    public User find(long userId) {
+        return users.get(userId);
     }
 
+    @Override
+    public void remove(long userId) {
+        users.remove(userId);
+    }
 
-    public Boolean isContains(Long userID) {
-        return users.containsKey(userID);
+    @Override
+    public Boolean isContains(long userId) {
+        return users.containsKey(userId);
+    }
+
+    @Override
+    public void setFriendship(User friend1, User friend2) {
+        add(friend1);
+        add(friend2);
+    }
+
+    @Override
+    public void removeFriendship(User friend1, User friend2) {
+        add(friend1);
+        add(friend2);
+    }
+
+    @Override
+    public List<Long> findFriends(long userId) {
+        return null;
     }
 }
