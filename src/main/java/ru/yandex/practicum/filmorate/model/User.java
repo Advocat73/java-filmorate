@@ -7,8 +7,8 @@ import ru.yandex.practicum.filmorate.validator.NotWithSpace;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Past;
 import java.time.LocalDate;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -25,6 +25,10 @@ public class User {
 
     public void addFriend(Long friendID, boolean isFriendAccept) {
         friends.put(friendID, isFriendAccept);
+    }
+
+    public void addFriends(Map<Long, Boolean> friends) {
+        if (friends != null) this.friends.putAll(friends);
     }
 
     public void removeFriend(Long friendID) {

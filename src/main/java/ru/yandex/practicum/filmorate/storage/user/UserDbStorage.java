@@ -7,8 +7,12 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -21,15 +25,15 @@ public class UserDbStorage implements UserStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @SuppressWarnings("checkstyle:SeparatorWrap")
     @Override
     public List<User> findUsers() {
-        ArrayList<User> users = new ArrayList<>();
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT * from users");
-        User user = makeUser(userRows);
-        while (user != null) {
-            users.add(user);
-            user = makeUser(userRows);
-        }
+        List<Map<String, Object>> friendsDatabaseResult = jdbcTemplate.queryForList("SELECT * from friends");
+        Map<Long, Map<Long, Boolean>> friends = new HashMap<>();
+        friendsDatabaseResult.forEach(map -> friends.computeIfAbsent((Long) map.get("user_id"), k -> new HashMap<>())
+                .put((Long) map.get("friend_id"), (Boolean) map.get("isAccepted")));
+        List<User> users = jdbcTemplate.query("SELECT * from users", (rs, rowNum) -> makeUserForList(rs));
+        users.forEach(user -> user.addFriends(friends.get(user.getId())));
         return users;
     }
 
@@ -104,4 +108,32 @@ public class UserDbStorage implements UserStorage {
         }
         return user;
     }
+
+    private User makeUserForList(ResultSet rs) throws SQLException {
+        return new User(
+                rs.getLong("id"),
+                rs.getString("email"),
+                rs.getString("login"),
+                rs.getString("name"),
+                rs.getDate("birthday").toLocalDate());
+    }
+
+    private User makeFriend(SqlRowSet userRows) {
+        User user = null;
+        if (userRows.next()) {
+            user = new User(
+                    userRows.getLong("id"),
+                    userRows.getString("email"),
+                    userRows.getString("login"),
+                    userRows.getString("name"),
+                    userRows.getDate("birthday").toLocalDate());
+        }
+        if (user != null) {
+            SqlRowSet friendRows = jdbcTemplate.queryForRowSet("select * from friends where user_id = ?", user.getId());
+            while (friendRows.next())
+                user.addFriend(friendRows.getLong("friend_id"), friendRows.getBoolean("isAccepted"));
+        }
+        return user;
+    }
 }
+
