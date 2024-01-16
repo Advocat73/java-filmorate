@@ -117,23 +117,5 @@ public class UserDbStorage implements UserStorage {
                 rs.getString("name"),
                 rs.getDate("birthday").toLocalDate());
     }
-
-    private User makeFriend(SqlRowSet userRows) {
-        User user = null;
-        if (userRows.next()) {
-            user = new User(
-                    userRows.getLong("id"),
-                    userRows.getString("email"),
-                    userRows.getString("login"),
-                    userRows.getString("name"),
-                    userRows.getDate("birthday").toLocalDate());
-        }
-        if (user != null) {
-            SqlRowSet friendRows = jdbcTemplate.queryForRowSet("select * from friends where user_id = ?", user.getId());
-            while (friendRows.next())
-                user.addFriend(friendRows.getLong("friend_id"), friendRows.getBoolean("isAccepted"));
-        }
-        return user;
-    }
 }
 

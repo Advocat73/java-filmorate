@@ -33,6 +33,11 @@ public class Film {
         likes.add(like);
     }
 
+    public void addLikes(Set<Long> likes) {
+        if (likes != null)
+            this.likes.addAll(likes);
+    }
+
     public void removeLike(long like) {
         likes.remove(like);
     }

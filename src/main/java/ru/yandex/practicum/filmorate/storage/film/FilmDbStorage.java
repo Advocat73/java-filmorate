@@ -10,8 +10,9 @@ import ru.yandex.practicum.filmorate.dao.MpaDao;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -29,13 +30,17 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> findFilms() {
-        ArrayList<Film> films = new ArrayList<>();
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("SELECT * from films");
-        Film film = makeFilm(filmRows);
-        while (film != null) {
-            films.add(film);
-            film = makeFilm(filmRows);
+        List<Film> films = jdbcTemplate.query("SELECT * from films", (rs, rowNum) -> makeFilmForList(rs));
+        List<Map<String, Object>> likesDatabaseResult = jdbcTemplate.queryForList("SELECT * from likes");
+        Map<Integer, Set<Long>> likes = new HashMap<>();
+        //likesDatabaseResult.forEach(map -> likes.computeIfAbsent((Integer) map.get("film_id"), k -> new HashSet<>())
+        //        .add((Long) map.get("user_id")));
+        for (Map<String, Object> map : likesDatabaseResult) {
+            likes.computeIfAbsent((Integer) map.get("film_id"), k -> new HashSet<>());
+            likes.get((Integer) map.get("film_id")).add((long) (Integer)map.get("user_id"));
         }
+        films.forEach(film -> film.addLikes(likes.get(film.getId())));
+
         return films;
     }
 
@@ -106,6 +111,19 @@ public class FilmDbStorage implements FilmStorage {
         }
         return film;
     }
+
+    private Film makeFilmForList(ResultSet rs) throws SQLException {
+        Film film = new Film(
+                rs.getInt("id"),
+                rs.getString("name"),
+                rs.getString("description"),
+                rs.getDate("release_date").toLocalDate(),
+                rs.getInt("duration"),
+                mpaDao.getMpaRating(rs.getInt("mpa_rate_id")));
+        film.setGenres(genreDao.getFilmGenres(film.getId()));
+
+        return film;
+}
 
     private void setGenresForFilm(Film film) {
         int filmId = film.getId();
