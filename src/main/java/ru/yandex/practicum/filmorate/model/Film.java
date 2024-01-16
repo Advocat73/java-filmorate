@@ -43,8 +43,9 @@ public class Film {
     }
 
     public void setGenres(List<Genre> genres) {
-        this.genres.clear();
-        this.genres.addAll(genres);
+        if (genres != null) {
+            this.genres.clear();
+            this.genres.addAll(genres);
+        }
     }
 }
-

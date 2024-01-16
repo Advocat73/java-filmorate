@@ -30,17 +30,13 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> findFilms() {
+        Map<Integer, Set<Long>> likes = getAllLikes();
+        Map<Integer, List<Genre>> filmGenres = getAllGenres();
         List<Film> films = jdbcTemplate.query("SELECT * from films", (rs, rowNum) -> makeFilmForList(rs));
-        List<Map<String, Object>> likesDatabaseResult = jdbcTemplate.queryForList("SELECT * from likes");
-        Map<Integer, Set<Long>> likes = new HashMap<>();
-        //likesDatabaseResult.forEach(map -> likes.computeIfAbsent((Integer) map.get("film_id"), k -> new HashSet<>())
-        //        .add((Long) map.get("user_id")));
-        for (Map<String, Object> map : likesDatabaseResult) {
-            likes.computeIfAbsent((Integer) map.get("film_id"), k -> new HashSet<>());
-            likes.get((Integer) map.get("film_id")).add((long) (Integer)map.get("user_id"));
-        }
-        films.forEach(film -> film.addLikes(likes.get(film.getId())));
-
+        films.forEach(film -> {
+            film.addLikes(likes.get(film.getId()));
+            film.setGenres(filmGenres.get(film.getId()));
+        });
         return films;
     }
 
@@ -99,7 +95,7 @@ public class FilmDbStorage implements FilmStorage {
                     filmRows.getInt("id"),
                     filmRows.getString("name"),
                     filmRows.getString("description"),
-                    filmRows.getDate("release_date").toLocalDate(),
+                    Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate(),
                     filmRows.getInt("duration"),
                     mpaDao.getMpaRating(filmRows.getInt("mpa_rate_id")));
         }
@@ -113,17 +109,14 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private Film makeFilmForList(ResultSet rs) throws SQLException {
-        Film film = new Film(
+        return new Film(
                 rs.getInt("id"),
                 rs.getString("name"),
                 rs.getString("description"),
                 rs.getDate("release_date").toLocalDate(),
                 rs.getInt("duration"),
                 mpaDao.getMpaRating(rs.getInt("mpa_rate_id")));
-        film.setGenres(genreDao.getFilmGenres(film.getId()));
-
-        return film;
-}
+    }
 
     private void setGenresForFilm(Film film) {
         int filmId = film.getId();
@@ -132,5 +125,25 @@ public class FilmDbStorage implements FilmStorage {
             genreDao.setFilmGenre(filmId, g.getId());
         film.setGenres(genreDao.getFilmGenres(film.getId()));
     }
-}
 
+    private Map<Integer, Set<Long>> getAllLikes() {
+        List<Map<String, Object>> likesDatabaseResult = jdbcTemplate.queryForList("SELECT * from likes");
+        Map<Integer, Set<Long>> likes = new HashMap<>();
+        //likesDatabaseResult.forEach(map -> likes.computeIfAbsent((Integer) map.get("film_id"), k -> new HashSet<>())
+        //        .add((long) (Integer) map.get("user_id")));
+        for (Map<String, Object> map : likesDatabaseResult) {
+            likes.computeIfAbsent((Integer) map.get("film_id"), k -> new HashSet<>());
+            likes.get((Integer) map.get("film_id")).add((long) (Integer) map.get("user_id"));
+        }
+        return likes;
+    }
+
+    private Map<Integer, List<Genre>> getAllGenres() {
+        String sql = "SELECT fg.film_id, fg.genre_id, g.name FROM film_genres AS fg JOIN genres AS g ON fg.genre_id = g.id";
+        List<Map<String, Object>> genreDatabaseResult = jdbcTemplate.queryForList(sql);
+        Map<Integer, List<Genre>> filmGenres = new HashMap<>();
+        genreDatabaseResult.forEach(map -> filmGenres.computeIfAbsent((Integer) map.get("film_id"), k -> new ArrayList<>())
+                .add(new Genre((Integer) map.get("genre_id"), (String) map.get("name"))));
+        return filmGenres;
+    }
+}
