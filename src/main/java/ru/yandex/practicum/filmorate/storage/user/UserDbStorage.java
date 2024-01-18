@@ -3,16 +3,14 @@ package ru.yandex.practicum.filmorate.storage.user;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -39,11 +37,12 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User add(User user) {
-        jdbcTemplate.update("INSERT INTO users (email, login, name, birthday) values (?, ?, ?, ?)",
-                user.getEmail(), user.getLogin(), user.getName(), user.getBirthday());
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT * FROM users ORDER BY id DESC LIMIT 1");
-        if (userRows.next())
-            user.setId(userRows.getLong("id"));
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(Objects.requireNonNull(jdbcTemplate.getDataSource()))
+                .withTableName("users")
+                .usingGeneratedKeyColumns("id");
+        Map<String, String> params = Map.of("email", user.getEmail(), "login", user.getLogin(), "name",
+                user.getName(), "birthday", user.getBirthday().toString());
+        user.setId(simpleJdbcInsert.executeAndReturnKey(params).longValue());
         return user;
     }
 
@@ -99,7 +98,7 @@ public class UserDbStorage implements UserStorage {
                     userRows.getString("email"),
                     userRows.getString("login"),
                     userRows.getString("name"),
-                    userRows.getDate("birthday").toLocalDate());
+                    Objects.requireNonNull(userRows.getDate("birthday")).toLocalDate());
         }
         if (user != null) {
             SqlRowSet friendRows = jdbcTemplate.queryForRowSet("select * from friends where user_id = ?", user.getId());

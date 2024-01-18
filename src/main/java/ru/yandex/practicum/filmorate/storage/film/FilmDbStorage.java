@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.GenreDao;
@@ -43,11 +44,12 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film add(Film film) {
         int mpaId = film.getMpa().getId();
-        jdbcTemplate.update("INSERT INTO films (name, description, release_date, duration, mpa_rate_id) values (?, ?, ?, ?, ?)",
-                film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), mpaId);
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("SELECT * FROM films ORDER BY id DESC LIMIT 1");
-        if (filmRows.next())
-            film.setId(filmRows.getInt("id"));
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(Objects.requireNonNull(jdbcTemplate.getDataSource()))
+                .withTableName("films")
+                .usingGeneratedKeyColumns("id");
+        Map<String, String> params = Map.of("name", film.getName(), "description", film.getDescription(), "release_date", film.getReleaseDate().toString(),
+                "duration", ((Integer)(film.getDuration())).toString(), "mpa_rate_id", ((Integer)mpaId).toString());
+        film.setId(simpleJdbcInsert.executeAndReturnKey(params).intValue());
         film.setMpa(mpaDao.getMpaRating(mpaId));
         setGenresForFilm(film);
         return film;
@@ -129,8 +131,6 @@ public class FilmDbStorage implements FilmStorage {
     private Map<Integer, Set<Long>> getAllLikes() {
         List<Map<String, Object>> likesDatabaseResult = jdbcTemplate.queryForList("SELECT * from likes");
         Map<Integer, Set<Long>> likes = new HashMap<>();
-        //likesDatabaseResult.forEach(map -> likes.computeIfAbsent((Integer) map.get("film_id"), k -> new HashSet<>())
-        //        .add((long) (Integer) map.get("user_id")));
         for (Map<String, Object> map : likesDatabaseResult) {
             likes.computeIfAbsent((Integer) map.get("film_id"), k -> new HashSet<>());
             likes.get((Integer) map.get("film_id")).add((long) (Integer) map.get("user_id"));
