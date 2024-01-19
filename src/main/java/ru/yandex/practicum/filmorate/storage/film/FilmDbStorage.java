@@ -48,7 +48,7 @@ public class FilmDbStorage implements FilmStorage {
                 .withTableName("films")
                 .usingGeneratedKeyColumns("id");
         Map<String, Object> params = Map.of("name", film.getName(), "description", film.getDescription(), "release_date", film.getReleaseDate(),
-                "duration", (film.getDuration()), "mpa_rate_id", mpaId);
+                "duration", film.getDuration(), "mpa_rate_id", mpaId);
         film.setId(simpleJdbcInsert.executeAndReturnKey(params).intValue());
         film.setMpa(mpaDao.getMpaRating(mpaId));
         setGenresForFilm(film);
