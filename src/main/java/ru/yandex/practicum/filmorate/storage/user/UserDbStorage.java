@@ -40,8 +40,8 @@ public class UserDbStorage implements UserStorage {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(Objects.requireNonNull(jdbcTemplate.getDataSource()))
                 .withTableName("users")
                 .usingGeneratedKeyColumns("id");
-        Map<String, String> params = Map.of("email", user.getEmail(), "login", user.getLogin(), "name",
-                user.getName(), "birthday", user.getBirthday().toString());
+        Map<String, Object> params = Map.of("email", user.getEmail(), "login", user.getLogin(), "name",
+                user.getName(), "birthday", user.getBirthday());
         user.setId(simpleJdbcInsert.executeAndReturnKey(params).longValue());
         return user;
     }
