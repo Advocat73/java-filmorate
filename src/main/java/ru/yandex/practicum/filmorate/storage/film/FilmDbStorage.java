@@ -132,8 +132,8 @@ public class FilmDbStorage implements FilmStorage {
         List<Map<String, Object>> likesDatabaseResult = jdbcTemplate.queryForList("SELECT * from likes");
         Map<Integer, Set<Long>> likes = new HashMap<>();
         for (Map<String, Object> map : likesDatabaseResult) {
-            likes.computeIfAbsent((Integer) map.get("film_id"), k -> new HashSet<>());
-            likes.get((Integer) map.get("film_id")).add((long) (Integer) map.get("user_id"));
+            likes.computeIfAbsent((Integer) map.get("film_id"), k -> new HashSet<>())
+            .add((long) (Integer) map.get("user_id"));
         }
         return likes;
     }
